@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
   Post,
@@ -15,7 +14,7 @@ import { UsersService } from './users.service';
 import { User } from '../interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import { validateUUIDV4 } from '../utils';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('user')
 export class UsersController {
@@ -43,7 +42,7 @@ export class UsersController {
   @UsePipes( new ValidationPipe())
   @Put(':id')
   async update(
-    @Param('id') id: string, @Body() dto: UpdateUserDto
+    @Param('id') id: string, @Body() dto: UpdatePasswordDto
   ): Promise<User> {
     validateUUIDV4( id )
     return this.userService.update( id, dto )

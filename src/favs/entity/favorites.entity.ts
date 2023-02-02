@@ -4,7 +4,7 @@ import { Album } from '../../interfaces/album.interface';
 import { Favorites, FavoritesRepsonse } from '../../interfaces/favorites.interface';
 import { truncate } from 'fs';
 
-export class FavoritesEntity implements Favorites{
+export class FavoritesEntity implements Favorites {
   artists: string[] = []
   tracks: string[] = []
   albums: string[] = []

@@ -1,7 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { Favorites, FavoritesDB, FavoritesRepsonse } from '../interfaces/favorites.interface';
-import { User } from '../interfaces/user.interface';
-import { FavoritesEntity } from '../favs/entity/favorites.entity';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 
 @Injectable()
@@ -18,7 +15,7 @@ export class DBService<T extends { id: string }> {
     return this.list
   }
 
-  async findOne<T>(id: string) {
+  async findOne<T>( id: string ) {
     const entity = this.list.find( entity => entity.id === id)
 
     if (!entity) {

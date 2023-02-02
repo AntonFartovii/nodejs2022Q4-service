@@ -3,7 +3,7 @@ import { DBService } from '../db/db.service';
 import { User } from '../interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import {v4 as uuidv4} from 'uuid'
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +32,7 @@ export class UsersService {
     return await this.dbService.findOne<T>( id )
   }
 
-  async update<T>(id: string, {oldPassword, newPassword}: UpdateUserDto ) {
+  async update<T>(id: string, {oldPassword, newPassword}: UpdatePasswordDto ) {
 
     const entity = await this.dbService.findOne<T>( id )
 
