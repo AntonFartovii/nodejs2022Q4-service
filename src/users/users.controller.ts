@@ -1,4 +1,58 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  UsePipes, ValidationPipe,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
+import { User } from '../interfaces/user.interface';
+import { CreateUserDto } from './dto/createUser.dto';
+import { validateUUIDV4 } from '../utils';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
-@Controller('users')
-export class UsersController {}
+@Controller('user')
+export class UsersController {
+  constructor(private userService: UsersService) {
+  }
+
+  @UsePipes( new ValidationPipe())
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() dto: CreateUserDto): Promise<User> {
+    return await this.userService.create(dto)
+  }
+
+  @Get()
+  async getAll():Promise<User[]> {
+    return await this.userService.getAll<User>()
+  }
+
+  @Get(':id')
+  async getOne(@Param('id') id: string): Promise<User> {
+    validateUUIDV4( id )
+    return await this.userService.getOne<User>( id )
+  }
+
+  @UsePipes( new ValidationPipe())
+  @Put(':id')
+  async update(
+    @Param('id') id: string, @Body() dto: UpdateUserDto
+  ): Promise<User> {
+    validateUUIDV4( id )
+    return this.userService.update( id, dto )
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param('id') id: string): Promise<void> {
+    validateUUIDV4( id )
+    await this.userService.delete<User>( id )
+  }
+}
