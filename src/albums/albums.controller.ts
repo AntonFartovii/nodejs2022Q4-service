@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { CreateTrackDto } from '../tracks/dto/createTrack.dto';
 import { Track } from '../interfaces/track.interface';
@@ -13,6 +25,7 @@ export class AlbumsController {
   constructor(private albumService: AlbumsService) {
   }
 
+  @UsePipes( new ValidationPipe())
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateAlbumDto): Promise<Album> {
@@ -25,11 +38,13 @@ export class AlbumsController {
   }
 
   @Get(':id')
+  @HttpCode(200)
   async getOne(@Param('id') id: string): Promise<Album> {
     validateUUIDV4( id )
     return await this.albumService.getOne<Album>( id )
   }
 
+  @UsePipes( new ValidationPipe())
   @Put(':id')
   async update(
     @Param('id') id: string, @Body() dto: UpdateAlbumDto

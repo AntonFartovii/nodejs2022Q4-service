@@ -1,16 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { Track } from '../interfaces/track.interface';
-import { CreateArtistDto } from '../artists/dto/createArtist.dto';
-import { Artist } from '../interfaces/artist.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { UpdateArtistDto } from '../artists/dto/updateArtist.dto';
 import { CreateTrackDto } from './dto/createTrack.dto';
 import { UpdateTrackDto } from './dto/updateTrack.dto';
+import { FavsService } from '../favs/favs.service';
+import { ArtistsService } from '../artists/artists.service';
 
 @Injectable()
 export class TracksService {
-  constructor(private readonly dbService: DBService<Track>) {
+  constructor(
+    private readonly dbService: DBService<Track>,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
+    @Inject(forwardRef(() => ArtistsService))
+    private artistsService: ArtistsService
+  ) {
   }
 
   async create( dto: CreateTrackDto ){
@@ -28,8 +33,8 @@ export class TracksService {
     return await this.dbService.findMany<T>()
   }
 
-  async getOne<T>(id: string) {
-    return await this.dbService.findOne<T>( id )
+  async getOne(id: string) {
+    return await this.dbService.findOne<Track>( id )
   }
 
   async update<T>(id: string, dto: UpdateTrackDto ) {
@@ -46,5 +51,36 @@ export class TracksService {
 
   async delete<T>(id: string): Promise<void> {
     await this.dbService.delete<T>( id )
+    await this.favsService.deleteId( id, 'tracks')
+  }
+
+  async getAllByFilter( ids: string[] ): Promise<Track[]> {
+    return await this.dbService.findManyByIds<Track>( ids )
+  }
+
+  async deleteArtistInTracks( artistId: string ) {
+    const entities: Track[] = await this.getAll<Track>()
+
+    for( let key in entities ) {
+      const entity = entities[key]
+
+      if ( entity.artistId === artistId ) {
+        entity.artistId = null
+        await this.dbService.patch<Track>( entity )
+      }
+    }
+  }
+
+  async deleteAlbumInTracks( albumId: string ) {
+    const entities: Track[] = await this.getAll<Track>()
+
+    for( let key in entities ) {
+      const entity = entities[key]
+
+      if ( entity.albumId === albumId ) {
+        entity.albumId= null
+        await this.dbService.patch<Track>( entity )
+      }
+    }
   }
 }

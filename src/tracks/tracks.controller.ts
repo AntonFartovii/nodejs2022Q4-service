@@ -37,7 +37,7 @@ export class TracksController {
   @Get(':id')
   async getOne(@Param('id') id: string): Promise<Track> {
     validateUUIDV4( id )
-    return await this.trackService.getOne<Track>( id )
+    return await this.trackService.getOne( id )
   }
 
   @UsePipes( new ValidationPipe())

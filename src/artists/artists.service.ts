@@ -1,14 +1,21 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { User } from '../interfaces/user.interface';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { Artist } from '../interfaces/artist.interface';
 import { CreateArtistDto } from './dto/createArtist.dto';
 import { UpdateArtistDto } from './dto/updateArtist.dto';
+import { FavsService } from '../favs/favs.service';
+import { TracksService } from '../tracks/tracks.service';
 
 @Injectable()
 export class ArtistsService {
-  constructor(private readonly dbService: DBService<Artist>) {
+  constructor(
+    private readonly dbService: DBService<Artist>,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
+    @Inject(forwardRef(() => TracksService))
+    private tracksService: TracksService
+  ) {
   }
 
   async create({name, grammy}: CreateArtistDto){
@@ -41,5 +48,11 @@ export class ArtistsService {
 
   async delete<T>(id: string): Promise<void> {
     await this.dbService.delete<T>( id )
+    await this.tracksService.deleteArtistInTracks( id )
+    await this.favsService.deleteId( id, 'artists')
+  }
+
+  async getAllByFilter( ids: string[] ): Promise<Artist[]> {
+    return await this.dbService.findManyByIds<Artist>( ids )
   }
 }

@@ -1,18 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { Album } from '../interfaces/album.interface';
-import { CreateTrackDto } from '../tracks/dto/createTrack.dto';
-import { Track } from '../interfaces/track.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { UpdateTrackDto } from '../tracks/dto/updateTrack.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
+import { FavsService } from '../favs/favs.service';
+import { TracksService } from '../tracks/tracks.service';
 
 @Injectable()
 export class AlbumsService {
-  constructor(private readonly dbService: DBService<Album>) {
+  constructor(
+    private readonly dbService: DBService<Album>,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
+    private tracksService: TracksService) {
   }
-
 
   async create( dto: CreateAlbumDto ){
     const entity: Album = {
@@ -36,6 +38,8 @@ export class AlbumsService {
     const entity = await this.dbService.findOne<Album>( id )
 
     entity.name = dto.name ?? entity.name
+    entity.year = dto.year ?? entity.year
+    entity.artistId = dto.artistId ?? entity.artistId
 
     await this.dbService.delete( id )
     return await this.dbService.patch<T>( entity )
@@ -43,5 +47,11 @@ export class AlbumsService {
 
   async delete<T>(id: string): Promise<void> {
     await this.dbService.delete<T>( id )
+    await this.tracksService.deleteAlbumInTracks( id )
+    await this.favsService.deleteId( id, 'albums')
+  }
+
+  async getAllByFilter( ids: string[] ): Promise<Album[]> {
+    return await this.dbService.findManyByIds<Album>( ids )
   }
 }
