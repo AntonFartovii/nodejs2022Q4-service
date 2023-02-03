@@ -39,22 +39,35 @@ export class FavsService {
   }
 
   async addEntity( id: string, name: string, service: string ) {
-    try {
-      await this[service].getOne( id )
+      await this.isExist( id, name, service )
+      await this.isAdded( id, name )
       this.db[name].push( id )
       return this.db
-    } catch (e) {
-      throw new HttpException('422', 422)
-    }
-
   }
 
-  async deleteEntity( id: string, name: string, service: string ) {
+  async deleteEntity( id: string, name: string, service: string ): Promise<void> {
     await this[service].getOne( id )
     await this.deleteId( id, name )
   }
 
-  async deleteId( id: string,  name: string, ) {
+  async deleteId( id: string,  name: string ): Promise<void> {
     this.db[name] = this.db[name].filter( entityId => entityId !== id )
+  }
+
+  async isAdded( id: string, name: string ): Promise<void> {
+      const res = this.db[name].find( entityId => entityId === id )
+      if ( res ) {
+        throw new HttpException(
+          `Entity ID = ${id} id added to favorites yet`, 400)
+      }
+  }
+
+  async isExist( id: string, name: string, service: string ): Promise<void> {
+    try {
+      await this[service].getOne( id )
+    } catch (e) {
+      throw new HttpException(
+        `Entity ID = ${id} in ${name} does not exist`, 422)
+    }
   }
 }
