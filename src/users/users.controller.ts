@@ -36,7 +36,7 @@ export class UsersController {
   @Get(':id')
   async getOne(@Param('id') id: string): Promise<User> {
     validateUUIDV4( id )
-    return await this.userService.getOne<User>( id )
+    return await this.userService.getOne( id )
   }
 
   @UsePipes( new ValidationPipe())

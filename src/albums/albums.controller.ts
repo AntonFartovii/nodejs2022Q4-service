@@ -41,7 +41,7 @@ export class AlbumsController {
   @HttpCode(200)
   async getOne(@Param('id') id: string): Promise<Album> {
     validateUUIDV4( id )
-    return await this.albumService.getOne<Album>( id )
+    return await this.albumService.getOne( id )
   }
 
   @UsePipes( new ValidationPipe())

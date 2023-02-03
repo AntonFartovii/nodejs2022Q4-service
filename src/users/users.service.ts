@@ -4,10 +4,15 @@ import { User } from '../interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import {v4 as uuidv4} from 'uuid'
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
+import { ServiceEntity } from '../entities/service.entity';
 
 @Injectable()
-export class UsersService {
-  constructor(private readonly dbService: DBService<User>) {
+export class UsersService extends ServiceEntity<User> {
+
+  constructor(
+    protected dbService: DBService<User>
+  ) {
+    super(dbService)
   }
 
   async create({login, password}: CreateUserDto): Promise<User> {
@@ -22,14 +27,6 @@ export class UsersService {
 
     await this.dbService.create( entity )
     return returnUserWithoutPassword( entity )
-  }
-
-  async getAll<T>() {
-    return await this.dbService.findMany<T>()
-  }
-
-  async getOne<T>(id: string) {
-    return await this.dbService.findOne<T>( id )
   }
 
   async update<T>(id: string, {oldPassword, newPassword}: UpdatePasswordDto ) {

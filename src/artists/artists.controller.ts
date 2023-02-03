@@ -41,7 +41,7 @@ export class ArtistsController {
   @HttpCode(200)
   async getOne(@Param('id') id: string) {
     validateUUIDV4( id )
-    return await this.artistService.getOne<Artist>( id )
+    return await this.artistService.getOne( id )
   }
 
   @UsePipes( new ValidationPipe())

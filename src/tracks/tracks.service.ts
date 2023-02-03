@@ -6,16 +6,20 @@ import { CreateTrackDto } from './dto/createTrack.dto';
 import { UpdateTrackDto } from './dto/updateTrack.dto';
 import { FavsService } from '../favs/favs.service';
 import { ArtistsService } from '../artists/artists.service';
+import { Album } from '../interfaces/album.interface';
+import { ServiceEntity } from '../entities/service.entity';
 
 @Injectable()
-export class TracksService {
+export class TracksService extends ServiceEntity<Track>{
   constructor(
-    private readonly dbService: DBService<Track>,
+
+    protected dbService: DBService<Track>,
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
     @Inject(forwardRef(() => ArtistsService))
     private artistsService: ArtistsService
   ) {
+    super(dbService)
   }
 
   async create( dto: CreateTrackDto ){
@@ -27,14 +31,6 @@ export class TracksService {
       albumId: dto.albumId
     }
     return await this.dbService.create<Track>( entity )
-  }
-
-  async getAll<T>() {
-    return await this.dbService.findMany<T>()
-  }
-
-  async getOne(id: string) {
-    return await this.dbService.findOne<Track>( id )
   }
 
   async update<T>(id: string, dto: UpdateTrackDto ) {
@@ -54,33 +50,7 @@ export class TracksService {
     await this.favsService.deleteId( id, 'tracks')
   }
 
-  async getAllByFilter( ids: string[] ): Promise<Track[]> {
-    return await this.dbService.findManyByIds<Track>( ids )
-  }
 
-  async deleteArtistInTracks( artistId: string ) {
-    const entities: Track[] = await this.getAll<Track>()
 
-    for( let key in entities ) {
-      const entity = entities[key]
 
-      if ( entity.artistId === artistId ) {
-        entity.artistId = null
-        await this.dbService.patch<Track>( entity )
-      }
-    }
-  }
-
-  async deleteAlbumInTracks( albumId: string ) {
-    const entities: Track[] = await this.getAll<Track>()
-
-    for( let key in entities ) {
-      const entity = entities[key]
-
-      if ( entity.albumId === albumId ) {
-        entity.albumId= null
-        await this.dbService.patch<Track>( entity )
-      }
-    }
-  }
 }

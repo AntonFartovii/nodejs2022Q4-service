@@ -6,16 +6,22 @@ import { CreateArtistDto } from './dto/createArtist.dto';
 import { UpdateArtistDto } from './dto/updateArtist.dto';
 import { FavsService } from '../favs/favs.service';
 import { TracksService } from '../tracks/tracks.service';
+import { AlbumsService } from '../albums/albums.service';
+import { Track } from '../interfaces/track.interface';
+import { Album } from '../interfaces/album.interface';
+import { ServiceEntity } from '../entities/service.entity';
 
 @Injectable()
-export class ArtistsService {
+export class ArtistsService extends ServiceEntity<Artist>{
   constructor(
-    private readonly dbService: DBService<Artist>,
+    protected dbService: DBService<Artist>,
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
     @Inject(forwardRef(() => TracksService))
-    private tracksService: TracksService
+    private tracksService: TracksService,
+    private albumsService: AlbumsService,
   ) {
+    super(dbService)
   }
 
   async create({name, grammy}: CreateArtistDto){
@@ -25,14 +31,6 @@ export class ArtistsService {
       grammy
     }
     return await this.dbService.create<Artist>( entity )
-  }
-
-  async getAll<T>() {
-    return await this.dbService.findMany<T>()
-  }
-
-  async getOne<T>(id: string) {
-    return await this.dbService.findOne<T>( id )
   }
 
   async update<T>(id: string, {name, grammy}: UpdateArtistDto ) {
@@ -48,11 +46,9 @@ export class ArtistsService {
 
   async delete<T>(id: string): Promise<void> {
     await this.dbService.delete<T>( id )
-    await this.tracksService.deleteArtistInTracks( id )
+    await this.tracksService.deleteRelationsIn<Track>('artistId', id)
+    await this.albumsService.deleteRelationsIn<Album>( 'artistId', id)
     await this.favsService.deleteId( id, 'artists')
   }
 
-  async getAllByFilter( ids: string[] ): Promise<Artist[]> {
-    return await this.dbService.findManyByIds<Artist>( ids )
-  }
 }

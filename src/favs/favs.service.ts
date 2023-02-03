@@ -30,7 +30,7 @@ export class FavsService {
 
     this.entities = {
       tracks: await this.tracksService.getAllByFilter( this.db.tracks ),
-      albums: await this.albumsService.getAllByFilter( this.db.albums),
+      albums: await this.albumsService.getAllByFilter( this.db.albums ),
       artists: await this.artistsService.getAllByFilter( this.db.artists )
     } as FavoritesRepsonse
 
