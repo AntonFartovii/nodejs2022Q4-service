@@ -34,7 +34,7 @@ export class ArtistsController {
 
   @Get()
   async getAll() {
-    return await this.artistService.getAll<Artist>()
+    return await this.artistService.getAll()
   }
 
   @Get(':id')
@@ -50,13 +50,13 @@ export class ArtistsController {
     @Param('id') id: string,
     @Body() dto: UpdateArtistDto) {
     validateUUIDV4( id )
-    return await this.artistService.update<Artist>( id, dto)
+    return await this.artistService.update( id, dto)
   }
 
   @Delete(':id')
   @HttpCode(204)
   async delete(@Param('id') id: string): Promise<void> {
     validateUUIDV4( id )
-    await this.artistService.delete<Artist>( id )
+    await this.artistService.delete( id )
   }
 }

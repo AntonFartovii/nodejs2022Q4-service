@@ -31,7 +31,7 @@ export class TracksController {
 
   @Get()
   async getAll():Promise<Track[]> {
-    return await this.trackService.getAll<Track>()
+    return await this.trackService.getAll()
   }
 
   @Get(':id')
@@ -53,6 +53,6 @@ export class TracksController {
   @HttpCode(204)
   async delete(@Param('id') id: string): Promise<void> {
     validateUUIDV4( id )
-    await this.trackService.delete<Track>( id )
+    await this.trackService.delete( id )
   }
 }

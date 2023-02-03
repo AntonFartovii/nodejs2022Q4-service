@@ -30,7 +30,7 @@ export class UsersController {
 
   @Get()
   async getAll():Promise<User[]> {
-    return await this.userService.getAll<User>()
+    return await this.userService.getAll()
   }
 
   @Get(':id')
@@ -52,6 +52,6 @@ export class UsersController {
   @HttpCode(204)
   async delete(@Param('id') id: string): Promise<void> {
     validateUUIDV4( id )
-    await this.userService.delete<User>( id )
+    await this.userService.delete( id )
   }
 }

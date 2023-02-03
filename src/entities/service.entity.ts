@@ -8,27 +8,28 @@ export class ServiceEntity<T extends {id: string}> {
   ) {
   }
 
-  async getAll<T>() {
-    return await this.dbService.findMany<T>()
+  async getAll(): Promise<T[]> {
+    return await this.dbService.findMany()
   }
 
-  async getOne(id: string) {
-    return await this.dbService.findOne<T>( id )
+  async getOne(id: string):Promise<T> {
+    return await this.dbService.findOne( id )
   }
 
   async getAllByFilter( ids: string[] ): Promise<T[]> {
-    return await this.dbService.findManyByIds<T>( ids )
+    return await this.dbService.findManyByIds( ids )
   }
 
-  async deleteRelationsIn<T>( relation: string, relationId: string ) {
-    const entities = await this.getAll<T>()
+  async deleteRelationsIn(
+    relation: string, relationId: string ): Promise<void> {
+    const entities = await this.getAll()
 
     for( let key in entities ) {
       const entity = entities[key]
 
       if ( entity[relation] === relationId ) {
         entity[relation] = null
-        await this.dbService.patch<T>( entity )
+        await this.dbService.patch( entity )
       }
     }
   }

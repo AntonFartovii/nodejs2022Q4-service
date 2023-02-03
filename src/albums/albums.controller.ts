@@ -34,7 +34,7 @@ export class AlbumsController {
 
   @Get()
   async getAll():Promise<Album[]> {
-    return await this.albumService.getAll<Album>()
+    return await this.albumService.getAll()
   }
 
   @Get(':id')
@@ -57,6 +57,6 @@ export class AlbumsController {
   @HttpCode(204)
   async delete(@Param('id') id: string): Promise<void> {
     validateUUIDV4( id )
-    await this.albumService.delete<Album>( id )
+    await this.albumService.delete( id )
   }
 }

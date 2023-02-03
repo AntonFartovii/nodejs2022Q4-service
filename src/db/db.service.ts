@@ -6,16 +6,16 @@ export class DBService<T extends { id: string }> {
 
   private list: T[] = []
 
-  async create<T>( entity ) {
+  async create( entity ) {
     this.list.push( entity )
     return entity
   }
 
-  async findMany<T>() {
+  async findMany() {
     return this.list
   }
 
-  async findOne<T>( id: string ) {
+  async findOne( id: string ) {
     const entity = this.list.find( entity => entity.id === id)
 
     if (!entity) {
@@ -26,17 +26,17 @@ export class DBService<T extends { id: string }> {
     return entity
   }
 
-  async patch<T>( entity ) {
+  async patch( entity ) {
     this.list.push( entity )
     return entity
   }
 
-  async delete<T>(id: string) {
-    await this.findOne<T>( id )
+  async delete(id: string) {
+    await this.findOne( id )
     this.list = this.list.filter( entity => entity.id !== id )
   }
 
-  async findManyByIds<T>( ids: string[] ) {
+  async findManyByIds( ids: string[] ) {
     let entities = []
 
     ids.forEach( id => {

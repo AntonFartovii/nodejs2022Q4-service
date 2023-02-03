@@ -30,11 +30,11 @@ export class TracksService extends ServiceEntity<Track>{
       artistId: dto.artistId,
       albumId: dto.albumId
     }
-    return await this.dbService.create<Track>( entity )
+    return await this.dbService.create( entity )
   }
 
-  async update<T>(id: string, dto: UpdateTrackDto ) {
-    const entity = await this.dbService.findOne<T>( id )
+  async update(id: string, dto: UpdateTrackDto ) {
+    const entity = await this.dbService.findOne( id )
 
     entity.name = dto.name ?? entity.name
     entity.duration = dto.duration ?? entity.duration
@@ -42,11 +42,11 @@ export class TracksService extends ServiceEntity<Track>{
     entity.albumId = dto.albumId ?? entity.albumId
 
     await this.dbService.delete( id )
-    return await this.dbService.patch<T>( entity )
+    return await this.dbService.patch( entity )
   }
 
-  async delete<T>(id: string): Promise<void> {
-    await this.dbService.delete<T>( id )
+  async delete(id: string): Promise<void> {
+    await this.dbService.delete( id )
     await this.favsService.deleteId( id, 'tracks')
   }
 

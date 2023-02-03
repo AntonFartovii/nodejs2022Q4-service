@@ -29,9 +29,9 @@ export class UsersService extends ServiceEntity<User> {
     return returnUserWithoutPassword( entity )
   }
 
-  async update<T>(id: string, {oldPassword, newPassword}: UpdatePasswordDto ) {
+  async update(id: string, {oldPassword, newPassword}: UpdatePasswordDto ) {
 
-    const entity = await this.dbService.findOne<T>( id )
+    const entity = await this.dbService.findOne( id )
 
     if ( !oldPassword || !newPassword ) {
       throw new HttpException('Password incorrect', HttpStatus.BAD_REQUEST)
@@ -47,12 +47,12 @@ export class UsersService extends ServiceEntity<User> {
     await this.dbService.delete( id )
 
     return returnUserWithoutPassword(
-      await this.dbService.patch<T>( entity )
+      await this.dbService.patch( entity )
     )
   }
 
-  async delete<T>(id: string): Promise<void> {
-    await this.dbService.delete<T>( id )
+  async delete(id: string): Promise<void> {
+    await this.dbService.delete( id )
   }
 }
 
