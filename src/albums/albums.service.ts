@@ -6,7 +6,6 @@ import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { FavsService } from '../favs/favs.service';
 import { TracksService } from '../tracks/tracks.service';
-import { Track } from '../interfaces/track.interface';
 import { ServiceEntity } from '../entities/service.entity';
 
 @Injectable()
@@ -29,7 +28,7 @@ export class AlbumsService extends ServiceEntity<Album> {
     return await this.dbService.create( entity )
   }
 
-  async update(id: string, dto: UpdateAlbumDto ) {
+  async update( id: string, dto: UpdateAlbumDto ) {
     const entity = await this.dbService.findOne( id )
 
     entity.name = dto.name ?? entity.name
@@ -40,14 +39,9 @@ export class AlbumsService extends ServiceEntity<Album> {
     return await this.dbService.patch( entity )
   }
 
-  async delete(id: string): Promise<void> {
+  async delete( id: string ): Promise<void> {
     await this.dbService.delete( id )
     await this.tracksService.deleteRelationsIn('albumId', id)
     await this.favsService.deleteId( id, 'albums')
   }
-
-
-
-
-
 }
