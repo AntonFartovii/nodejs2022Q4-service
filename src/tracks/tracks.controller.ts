@@ -19,40 +19,40 @@ import { UpdateTrackDto } from './dto/updateTrack.dto';
 
 @Controller('track')
 export class TracksController {
-  constructor(private trackService: TracksService) {
-  }
+  constructor(private trackService: TracksService) {}
 
-  @UsePipes( new ValidationPipe())
+  @UsePipes(new ValidationPipe())
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateTrackDto): Promise<Track> {
-    return await this.trackService.create(dto)
+    return await this.trackService.create(dto);
   }
 
   @Get()
-  async getAll():Promise<Track[]> {
-    return await this.trackService.getAll()
+  async getAll(): Promise<Track[]> {
+    return await this.trackService.getAll();
   }
 
   @Get(':id')
   async getOne(@Param('id') id: string): Promise<Track> {
-    validateUUIDV4( id )
-    return await this.trackService.getOne( id )
+    validateUUIDV4(id);
+    return await this.trackService.getOne(id);
   }
 
-  @UsePipes( new ValidationPipe())
+  @UsePipes(new ValidationPipe())
   @Put(':id')
   async update(
-    @Param('id') id: string, @Body() dto: UpdateTrackDto
+    @Param('id') id: string,
+    @Body() dto: UpdateTrackDto,
   ): Promise<Track> {
-    validateUUIDV4( id )
-    return this.trackService.update( id, dto )
+    validateUUIDV4(id);
+    return this.trackService.update(id, dto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   async delete(@Param('id') id: string): Promise<void> {
-    validateUUIDV4( id )
-    await this.trackService.delete( id )
+    validateUUIDV4(id);
+    await this.trackService.delete(id);
   }
 }

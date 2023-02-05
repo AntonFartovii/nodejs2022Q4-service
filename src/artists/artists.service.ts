@@ -7,12 +7,10 @@ import { UpdateArtistDto } from './dto/updateArtist.dto';
 import { FavsService } from '../favs/favs.service';
 import { TracksService } from '../tracks/tracks.service';
 import { AlbumsService } from '../albums/albums.service';
-import { Track } from '../interfaces/track.interface';
-import { Album } from '../interfaces/album.interface';
 import { ServiceEntity } from '../entities/service.entity';
 
 @Injectable()
-export class ArtistsService extends ServiceEntity<Artist>{
+export class ArtistsService extends ServiceEntity<Artist> {
   constructor(
     protected dbService: DBService<Artist>,
     @Inject(forwardRef(() => FavsService))
@@ -21,34 +19,33 @@ export class ArtistsService extends ServiceEntity<Artist>{
     private tracksService: TracksService,
     private albumsService: AlbumsService,
   ) {
-    super(dbService)
+    super(dbService);
   }
 
-  async create({name, grammy}: CreateArtistDto){
+  async create({ name, grammy }: CreateArtistDto) {
     const entity: Artist = {
       id: uuidv4(),
       name,
-      grammy
-    }
-    return await this.dbService.create( entity )
+      grammy,
+    };
+    return await this.dbService.create(entity);
   }
 
-  async update(id: string, {name, grammy}: UpdateArtistDto ) {
-    const entity = await this.dbService.findOne( id )
+  async update(id: string, { name, grammy }: UpdateArtistDto) {
+    const entity = await this.dbService.findOne(id);
 
-    entity.name = name ?? entity.name
-    entity.grammy = grammy ?? entity.grammy
+    entity.name = name ?? entity.name;
+    entity.grammy = grammy ?? entity.grammy;
 
-    await this.dbService.delete( id )
+    await this.dbService.delete(id);
 
-    return await this.dbService.patch( entity )
+    return await this.dbService.patch(entity);
   }
 
   async delete(id: string): Promise<void> {
-    await this.dbService.delete( id )
-    await this.tracksService.deleteRelationsIn('artistId', id)
-    await this.albumsService.deleteRelationsIn( 'artistId', id)
-    await this.favsService.deleteId( id, 'artists')
+    await this.dbService.delete(id);
+    await this.tracksService.deleteRelationsIn('artistId', id);
+    await this.albumsService.deleteRelationsIn('artistId', id);
+    await this.favsService.deleteId(id, 'artists');
   }
-
 }

@@ -8,7 +8,8 @@ import {
   Param,
   Post,
   Put,
-  UsePipes, ValidationPipe,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../interfaces/user.interface';
@@ -18,40 +19,40 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('user')
 export class UsersController {
-  constructor(private userService: UsersService) {
-  }
+  constructor(private userService: UsersService) {}
 
-  @UsePipes( new ValidationPipe())
+  @UsePipes(new ValidationPipe())
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateUserDto): Promise<User> {
-    return await this.userService.create(dto)
+    return await this.userService.create(dto);
   }
 
   @Get()
-  async getAll():Promise<User[]> {
-    return await this.userService.getAll()
+  async getAll(): Promise<User[]> {
+    return await this.userService.getAll();
   }
 
   @Get(':id')
   async getOne(@Param('id') id: string): Promise<User> {
-    validateUUIDV4( id )
-    return await this.userService.getOne( id )
+    validateUUIDV4(id);
+    return await this.userService.getOne(id);
   }
 
-  @UsePipes( new ValidationPipe())
+  @UsePipes(new ValidationPipe())
   @Put(':id')
   async update(
-    @Param('id') id: string, @Body() dto: UpdatePasswordDto
+    @Param('id') id: string,
+    @Body() dto: UpdatePasswordDto,
   ): Promise<User> {
-    validateUUIDV4( id )
-    return this.userService.update( id, dto )
+    validateUUIDV4(id);
+    return this.userService.update(id, dto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   async delete(@Param('id') id: string): Promise<void> {
-    validateUUIDV4( id )
-    await this.userService.delete( id )
+    validateUUIDV4(id);
+    await this.userService.delete(id);
   }
 }

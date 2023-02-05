@@ -6,13 +6,9 @@ import { FavsModule } from '../favs/favs.module';
 import { ArtistsModule } from '../artists/artists.module';
 
 @Module({
-  imports: [
-    forwardRef(() => FavsModule),
-    forwardRef(() => ArtistsModule)
-  ],
+  imports: [forwardRef(() => FavsModule), forwardRef(() => ArtistsModule)],
   controllers: [TracksController],
   providers: [TracksService, DBService],
-  exports: [TracksService]
-
+  exports: [TracksService],
 })
 export class TracksModule {}

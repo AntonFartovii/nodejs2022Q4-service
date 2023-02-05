@@ -8,12 +8,12 @@ import { AlbumsModule } from '../albums/albums.module';
 
 @Module({
   imports: [
-    forwardRef( () => FavsModule),
-    forwardRef( () => TracksModule),
-    AlbumsModule
+    forwardRef(() => FavsModule),
+    forwardRef(() => TracksModule),
+    AlbumsModule,
   ],
   controllers: [ArtistsController],
   providers: [ArtistsService, DBService],
-  exports: [ArtistsService]
+  exports: [ArtistsService],
 })
 export class ArtistsModule {}

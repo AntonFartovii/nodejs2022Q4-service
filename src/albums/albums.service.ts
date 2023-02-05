@@ -14,34 +14,35 @@ export class AlbumsService extends ServiceEntity<Album> {
     protected dbService: DBService<Album>,
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
-    private tracksService: TracksService) {
-    super(dbService)
+    private tracksService: TracksService,
+  ) {
+    super(dbService);
   }
 
-  async create( dto: CreateAlbumDto ){
+  async create(dto: CreateAlbumDto) {
     const entity: Album = {
       id: uuidv4(),
       name: dto.name,
       year: dto.year,
-      artistId: dto.artistId
-    }
-    return await this.dbService.create( entity )
+      artistId: dto.artistId,
+    };
+    return await this.dbService.create(entity);
   }
 
-  async update( id: string, dto: UpdateAlbumDto ) {
-    const entity = await this.dbService.findOne( id )
+  async update(id: string, dto: UpdateAlbumDto) {
+    const entity = await this.dbService.findOne(id);
 
-    entity.name = dto.name ?? entity.name
-    entity.year = dto.year ?? entity.year
-    entity.artistId = dto.artistId ?? entity.artistId
+    entity.name = dto.name ?? entity.name;
+    entity.year = dto.year ?? entity.year;
+    entity.artistId = dto.artistId ?? entity.artistId;
 
-    await this.dbService.delete( id )
-    return await this.dbService.patch( entity )
+    await this.dbService.delete(id);
+    return await this.dbService.patch(entity);
   }
 
-  async delete( id: string ): Promise<void> {
-    await this.dbService.delete( id )
-    await this.tracksService.deleteRelationsIn('albumId', id)
-    await this.favsService.deleteId( id, 'albums')
+  async delete(id: string): Promise<void> {
+    await this.dbService.delete(id);
+    await this.tracksService.deleteRelationsIn('albumId', id);
+    await this.favsService.deleteId(id, 'albums');
   }
 }

@@ -9,10 +9,10 @@ import { ArtistsModule } from '../artists/artists.module';
   imports: [
     forwardRef(() => TracksModule),
     forwardRef(() => AlbumsModule),
-    forwardRef(() => ArtistsModule)
+    forwardRef(() => ArtistsModule),
   ],
   controllers: [FavsController],
   providers: [FavsService],
-  exports: [FavsService]
+  exports: [FavsService],
 })
 export class FavsModule {}
