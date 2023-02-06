@@ -61,7 +61,7 @@ export class FavsService {
     const res = this.db[name].find((entityId) => entityId === id);
     if (res) {
       throw new HttpException(
-        `Entity ID = ${id} id added to favorites yet`,
+        `Entity ID = ${id} is already added to favorites`,
         400,
       );
     }
