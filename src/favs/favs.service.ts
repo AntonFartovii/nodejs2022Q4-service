@@ -38,8 +38,8 @@ export class FavsService {
   }
 
   async addEntity(id: string, type: string) {
-    const name = type + 's'
-    const service = type + 'sService'
+    const name = type + 's';
+    const service = type + 'sService';
     await this.isExist(id, name, service);
     await this.isAdded(id, name);
     this.db[name].push(id);
@@ -47,8 +47,8 @@ export class FavsService {
   }
 
   async deleteEntity(id: string, type: string): Promise<void> {
-    const name = type + 's'
-    const service = type + 'sService'
+    const name = type + 's';
+    const service = type + 'sService';
     await this[service].getOne(id);
     await this.deleteId(id, name);
   }

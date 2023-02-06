@@ -22,22 +22,15 @@ export class FavsController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('/:type/:id')
-  async addTrack(
-    @Param('id') id: string,
-    @Param('type') type: string
-    ) {
+  async addTrack(@Param('id') id: string, @Param('type') type: string) {
     validateUUIDV4(id);
-    return await this.favsService.addEntity( id, type );
+    return await this.favsService.addEntity(id, type);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('/:type/:id')
-  async deleteTrack(
-    @Param('id') id: string,
-    @Param('type') type: string
-  ) {
+  async deleteTrack(@Param('id') id: string, @Param('type') type: string) {
     validateUUIDV4(id);
-    await this.favsService.deleteEntity( id, type );
+    await this.favsService.deleteEntity(id, type);
   }
-
 }

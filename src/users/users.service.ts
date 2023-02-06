@@ -26,6 +26,15 @@ export class UsersService extends ServiceEntity<User> {
     return returnUserWithoutPassword(entity);
   }
 
+  async getOne(id: string): Promise<User> {
+    return returnUserWithoutPassword(await this.dbService.findOne(id));
+  }
+
+  async getAll(): Promise<User[]> {
+    const entities = await this.dbService.findMany()
+    return entities.map( entity => returnUserWithoutPassword( entity ))
+  }
+
   async update(id: string, { oldPassword, newPassword }: UpdatePasswordDto) {
     const entity = await this.dbService.findOne(id);
 
