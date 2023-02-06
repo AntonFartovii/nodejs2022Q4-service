@@ -21,44 +21,23 @@ export class FavsController {
   }
 
   @HttpCode(HttpStatus.CREATED)
-  @Post('/track/:id')
-  async addTrack(@Param('id') id: string) {
+  @Post('/:type/:id')
+  async addTrack(
+    @Param('id') id: string,
+    @Param('type') type: string
+    ) {
     validateUUIDV4(id);
-    return await this.favsService.addEntity(id, 'tracks', 'tracksService');
-  }
-
-  @HttpCode(HttpStatus.CREATED)
-  @Post('/album/:id')
-  async addAlbum(@Param('id') id: string) {
-    validateUUIDV4(id);
-    return await this.favsService.addEntity(id, 'albums', 'albumsService');
-  }
-
-  @HttpCode(HttpStatus.CREATED)
-  @Post('/artist/:id')
-  async addArtist(@Param('id') id: string) {
-    validateUUIDV4(id);
-    return await this.favsService.addEntity(id, 'artists', 'artistsService');
+    return await this.favsService.addEntity( id, type );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete('/track/:id')
-  async deleteTrack(@Param('id') id: string) {
+  @Delete('/:type/:id')
+  async deleteTrack(
+    @Param('id') id: string,
+    @Param('type') type: string
+  ) {
     validateUUIDV4(id);
-    await this.favsService.deleteEntity(id, 'tracks', 'tracksService');
+    await this.favsService.deleteEntity( id, type );
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete('/album/:id')
-  async deleteAlbum(@Param('id') id: string) {
-    validateUUIDV4(id);
-    await this.favsService.deleteEntity(id, 'albums', 'albumsService');
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete('/artist/:id')
-  async deleteArtist(@Param('id') id: string) {
-    validateUUIDV4(id);
-    await this.favsService.deleteEntity(id, 'artists', 'artistsService');
-  }
 }

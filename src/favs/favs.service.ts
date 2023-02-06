@@ -37,14 +37,18 @@ export class FavsService {
     return this.entities;
   }
 
-  async addEntity(id: string, name: string, service: string) {
+  async addEntity(id: string, type: string) {
+    const name = type + 's'
+    const service = type + 'sService'
     await this.isExist(id, name, service);
     await this.isAdded(id, name);
     this.db[name].push(id);
     return this.db;
   }
 
-  async deleteEntity(id: string, name: string, service: string): Promise<void> {
+  async deleteEntity(id: string, type: string): Promise<void> {
+    const name = type + 's'
+    const service = type + 'sService'
     await this[service].getOne(id);
     await this.deleteId(id, name);
   }

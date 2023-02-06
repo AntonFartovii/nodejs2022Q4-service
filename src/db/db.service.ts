@@ -9,7 +9,7 @@ export class DBService<T extends { id: string }> {
     return entity;
   }
 
-  async findMany() {
+  findMany = () => {
     return this.list;
   }
 
