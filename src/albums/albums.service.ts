@@ -24,7 +24,7 @@ export class AlbumsService extends ServiceEntity<Album> {
       id: uuidv4(),
       name: dto.name,
       year: dto.year,
-      artistId: dto.artistId,
+      artistId: dto.artistId || null,
     };
     return await this.dbService.create(entity);
   }

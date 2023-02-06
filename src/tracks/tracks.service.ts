@@ -25,8 +25,8 @@ export class TracksService extends ServiceEntity<Track> {
       id: uuidv4(),
       name: dto.name,
       duration: dto.duration,
-      artistId: dto.artistId,
-      albumId: dto.albumId,
+      artistId: dto.artistId || null,
+      albumId: dto.albumId || null,
     };
     return await this.dbService.create(entity);
   }
