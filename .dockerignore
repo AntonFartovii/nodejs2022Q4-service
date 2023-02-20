@@ -1,2 +1,7 @@
 dist
 node_modules
+pgdata
+doc
+.eslintrc.js
+.gitignore
+npm-debug.log

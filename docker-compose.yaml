@@ -1,27 +1,17 @@
-version: '3.8'
+version: '3.7'
 
 services:
-  db:
-    container_name: postgres-ant
-    build: ./database
-    restart: always
-    environment:
-      - POSTGRES_USER=${TYPEORM_USERNAME}
-      - POSTGRES_PASSWORD=${TYPEORM_PASSWORD}
-      - POSTGRES_DB=${TYPEORM_DATABASE}
-    networks:
-      - back
-    volumes:
-    - ./pgdata:/var/lib/postgresql/data
-    ports:
-    - ${TYPEORM_PORT}:${TYPEORM_PORT}
   backend:
-    container_name: backend-ant
     build:
       context: ./
+      dockerfile: Dockerfile
     depends_on:
       - db
-    restart: unless-stopped
+    volumes:
+      - .:/usr/nodejs2022Q4
+      - /usr/nodejs2022Q4/node_modules
+    command: npm run start:dev
+    restart: always
     ports:
     - ${PORT}:${PORT}
     environment:
@@ -33,6 +23,21 @@ services:
       - TYPEORM_HOST=db
     networks:
       - back
-
+  db:
+    image: anton/pg
+    build: ./database
+    restart: always
+    environment:
+      - POSTGRES_USER=${TYPEORM_USERNAME}
+      - POSTGRES_PASSWORD=${TYPEORM_PASSWORD}
+      - POSTGRES_DB=${TYPEORM_DATABASE}
+    networks:
+      - back
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - ${TYPEORM_PORT}:${TYPEORM_PORT}
 networks:
   back:
+volumes:
+  pgdata:

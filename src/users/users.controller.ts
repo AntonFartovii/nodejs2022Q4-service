@@ -11,7 +11,6 @@ import {
   UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from '../interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import { validateUUIDV4 } from '../utils';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';

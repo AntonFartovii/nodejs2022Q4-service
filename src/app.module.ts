@@ -7,16 +7,11 @@ import { TracksModule } from './tracks/tracks.module';
 import { AlbumsModule } from './albums/albums.module';
 import { FavsModule } from './favs/favs.module';
 import {TypeOrmModule} from '@nestjs/typeorm'
-import { ConfigModule } from '@nestjs/config';
-import typeormconfig from './typeormconfig';
+import typeormconfig from '../ormconfig';
 
 @Module({
   imports: [
     UsersModule, ArtistsModule, TracksModule, AlbumsModule, FavsModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '../.env',
-    }),
     TypeOrmModule.forRoot(typeormconfig)
   ],
   controllers: [AppController],

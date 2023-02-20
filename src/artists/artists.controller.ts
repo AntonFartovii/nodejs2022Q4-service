@@ -12,7 +12,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
-import { Artist } from '../interfaces/artist.interface';
 import { CreateArtistDto } from './dto/createArtist.dto';
 import { validateUUIDV4 } from '../utils';
 import { UpdateArtistDto } from './dto/updateArtist.dto';

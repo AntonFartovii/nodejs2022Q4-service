@@ -1,16 +1,12 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { DBService } from '../db/db.service';
 import { Album } from '../interfaces/album.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { FavsService } from '../favs/favs.service';
-import { TracksService } from '../tracks/tracks.service';
-import { ServiceEntity } from '../entities/service.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AlbumEntity } from './entities/album.entity';
 import { In, Repository } from 'typeorm';
-import { TrackEntity } from '../tracks/entities/track.entity';
 
 @Injectable()
 export class AlbumsService {
