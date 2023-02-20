@@ -1,5 +1,5 @@
 import {
-  Body,
+  Body, ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
+  Put, UseInterceptors,
   UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -15,37 +15,41 @@ import { User } from '../interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import { validateUUIDV4 } from '../utils';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
+import { UserEntity } from './entities/user.entity';
+import { ResponseUserDto } from './dto/responseUser.dto';
 
 @Controller('user')
 export class UsersController {
   constructor(private userService: UsersService) {
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes( new ValidationPipe())
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateUserDto): Promise<User> {
+  async create(@Body() dto: CreateUserDto): Promise<ResponseUserDto> {
     return await this.userService.create(dto)
   }
 
   @Get()
-  async getAll():Promise<User[]> {
-    return await this.userService.getAll()
+  async getAll():Promise<UserEntity[]> {
+    return await this.userService.findAll()
   }
 
   @Get(':id')
-  async getOne(@Param('id') id: string): Promise<User> {
+  async getOne(@Param('id') id: string): Promise<UserEntity> {
     validateUUIDV4( id )
-    return await this.userService.getOne( id )
+    return await this.userService.findOne( id )
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes( new ValidationPipe())
   @Put(':id')
   async update(
     @Param('id') id: string, @Body() dto: UpdatePasswordDto
-  ): Promise<User> {
+  ): Promise<ResponseUserDto> {
     validateUUIDV4( id )
-    return this.userService.update( id, dto )
+    return await this.userService.update( id, dto )
   }
 
   @Delete(':id')

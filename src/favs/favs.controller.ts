@@ -1,15 +1,27 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FavsService } from './favs.service';
 import { FavoritesRepsonse } from '../interfaces/favorites.interface';
 import { validateUUIDV4 } from '../utils';
+import { FavoritesEntityRes } from './entity/favorites.entity';
 
 @Controller('favs')
 export class FavsController {
   constructor(private favsService: FavsService) {
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getAll(): Promise<FavoritesRepsonse> {
+  async getAll(): Promise<FavoritesEntityRes> {
     return await this.favsService.getAll()
   }
 

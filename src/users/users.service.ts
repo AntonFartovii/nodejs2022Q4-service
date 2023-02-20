@@ -1,37 +1,46 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DBService } from '../db/db.service';
-import { User } from '../interfaces/user.interface';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUser.dto';
-import {v4 as uuidv4} from 'uuid'
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
-import { ServiceEntity } from '../entities/service.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { ResponseUserDto } from './dto/responseUser.dto';
 
 @Injectable()
-export class UsersService extends ServiceEntity<User> {
+export class UsersService  {
 
   constructor(
-    protected dbService: DBService<User>
+    @InjectRepository(UserEntity)
+    private readonly dbService: Repository<UserEntity>
   ) {
-    super(dbService)
   }
 
-  async create({login, password}: CreateUserDto): Promise<User> {
-    const entity: User = {
-      id: uuidv4(),
-      login,
-      password,
-      version: 1,
-      createdAt: new Date().getTime(),
-      updatedAt: new Date().getTime()
+  async create( createUserDto: CreateUserDto): Promise<ResponseUserDto> {
+    const entity = { ...createUserDto }
+
+    const res = await this.dbService.create( entity )
+    return (await this.dbService.save( res )).toResponse()
+
+  }
+
+  async findOne( id: string ): Promise<UserEntity> {
+    const entity = await this.dbService.findOne({where:{id}})
+
+    if (!entity) {
+      throw new HttpException(
+        'Entity does not exist',
+        HttpStatus.NOT_FOUND)
     }
-
-    await this.dbService.create( entity )
-    return returnUserWithoutPassword( entity )
+    return entity
   }
 
-  async update(id: string, {oldPassword, newPassword}: UpdatePasswordDto ) {
+  async findAll(): Promise<UserEntity[]> {
+    return await this.dbService.find()
+  }
 
-    const entity = await this.dbService.findOne( id )
+  async update(id: string, updatePasswordDto: UpdatePasswordDto ): Promise<ResponseUserDto> {
+    const {oldPassword, newPassword} = updatePasswordDto
+    const entity: UserEntity = await this.findOne( id ) as UserEntity
 
     if ( !oldPassword || !newPassword ) {
       throw new HttpException('Password incorrect', HttpStatus.BAD_REQUEST)
@@ -41,22 +50,18 @@ export class UsersService extends ServiceEntity<User> {
       throw new HttpException('Password incorrect', HttpStatus.FORBIDDEN)
     }
 
-    entity.password = newPassword
-    entity.version += 1
-    entity.updatedAt = new Date().getTime()
-    await this.dbService.delete( id )
+    const updatedEntity = new UserEntity({
+      ...entity,
+      password: newPassword,
+    })
 
-    return returnUserWithoutPassword(
-      await this.dbService.patch( entity )
-    )
+    return (await this.dbService.save( updatedEntity )).toResponse()
   }
 
   async delete(id: string): Promise<void> {
-    await this.dbService.delete( id )
+    const res = await this.dbService.delete( id )
+    if ( res.affected === 0) {
+      throw new NotFoundException(`User id = ${id} not found`)
+    }
   }
-}
-
-function returnUserWithoutPassword( entity: User ) {
-  const newEntity = Object.entries( entity ).filter( field => field[0] !== 'password')
-  return Object.fromEntries( newEntity ) as User;
 }

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { Track } from '../interfaces/track.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,18 +8,21 @@ import { FavsService } from '../favs/favs.service';
 import { ArtistsService } from '../artists/artists.service';
 import { Album } from '../interfaces/album.interface';
 import { ServiceEntity } from '../entities/service.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from '../users/entities/user.entity';
+import { In, Repository } from 'typeorm';
+import { TrackEntity } from './entities/track.entity';
 
 @Injectable()
-export class TracksService extends ServiceEntity<Track>{
+export class TracksService {
   constructor(
-
-    protected dbService: DBService<Track>,
+    @InjectRepository(TrackEntity)
+    private readonly dbService: Repository<TrackEntity>,
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
     @Inject(forwardRef(() => ArtistsService))
     private artistsService: ArtistsService
   ) {
-    super(dbService)
   }
 
   async create( dto: CreateTrackDto ){
@@ -30,27 +33,42 @@ export class TracksService extends ServiceEntity<Track>{
       artistId: dto.artistId,
       albumId: dto.albumId
     }
-    return await this.dbService.create( entity )
+    const res = await this.dbService.create( entity )
+    return await this.dbService.save( res )
+  }
+
+  async findOne( id: string ): Promise<TrackEntity> {
+    const entity = await this.dbService.findOne({where:{id}})
+
+    if (!entity) {
+      throw new HttpException(
+        'Entity does not exist',
+        HttpStatus.NOT_FOUND)
+    }
+    return entity
+  }
+
+  async findAll(): Promise<TrackEntity[]> {
+    return await this.dbService.find()
   }
 
   async update(id: string, dto: UpdateTrackDto ) {
-    const entity = await this.dbService.findOne( id )
+    const entity = await this.findOne( id )
 
     entity.name = dto.name ?? entity.name
     entity.duration = dto.duration ?? entity.duration
     entity.artistId = dto.artistId ?? entity.artistId
     entity.albumId = dto.albumId ?? entity.albumId
 
-    await this.dbService.delete( id )
-    return await this.dbService.patch( entity )
+    return await this.dbService.save( entity )
   }
 
   async delete(id: string): Promise<void> {
-    await this.dbService.delete( id )
-    await this.favsService.deleteId( id, 'tracks')
+    const res = await this.dbService.delete( id )
+
+    if ( res.affected === 0) {
+      throw new NotFoundException(`User id = ${id} not found`)
+    }
   }
-
-
-
 
 }

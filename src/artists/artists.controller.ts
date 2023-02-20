@@ -11,14 +11,12 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreateUserDto } from '../users/dto/createUser.dto';
-import { User } from '../interfaces/user.interface';
-import { UsersService } from '../users/users.service';
 import { ArtistsService } from './artists.service';
 import { Artist } from '../interfaces/artist.interface';
 import { CreateArtistDto } from './dto/createArtist.dto';
 import { validateUUIDV4 } from '../utils';
 import { UpdateArtistDto } from './dto/updateArtist.dto';
+import { ArtistEntity } from './entities/artist.entity';
 
 @Controller('artist')
 export class ArtistsController {
@@ -28,20 +26,20 @@ export class ArtistsController {
   @UsePipes( new ValidationPipe())
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateArtistDto): Promise<Artist> {
+  async create(@Body() dto: CreateArtistDto): Promise<ArtistEntity> {
     return await this.artistService.create(dto)
   }
 
   @Get()
   async getAll() {
-    return await this.artistService.getAll()
+    return await this.artistService.findAll()
   }
 
   @Get(':id')
   @HttpCode(200)
   async getOne(@Param('id') id: string) {
     validateUUIDV4( id )
-    return await this.artistService.getOne( id )
+    return await this.artistService.findOne( id )
   }
 
   @UsePipes( new ValidationPipe())

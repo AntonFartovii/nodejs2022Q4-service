@@ -12,13 +12,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
-import { CreateTrackDto } from '../tracks/dto/createTrack.dto';
-import { Track } from '../interfaces/track.interface';
 import { validateUUIDV4 } from '../utils';
-import { UpdateTrackDto } from '../tracks/dto/updateTrack.dto';
 import { Album } from '../interfaces/album.interface';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
+import { AlbumEntity } from './entities/album.entity';
 
 @Controller('album')
 export class AlbumsController {
@@ -28,20 +26,20 @@ export class AlbumsController {
   @UsePipes( new ValidationPipe())
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateAlbumDto): Promise<Album> {
+  async create(@Body() dto: CreateAlbumDto): Promise<AlbumEntity> {
     return await this.albumService.create(dto)
   }
 
   @Get()
   async getAll():Promise<Album[]> {
-    return await this.albumService.getAll()
+    return await this.albumService.findAll()
   }
 
   @Get(':id')
   @HttpCode(200)
-  async getOne(@Param('id') id: string): Promise<Album> {
+  async getOne(@Param('id') id: string): Promise<AlbumEntity> {
     validateUUIDV4( id )
-    return await this.albumService.getOne( id )
+    return await this.albumService.findOne( id )
   }
 
   @UsePipes( new ValidationPipe())

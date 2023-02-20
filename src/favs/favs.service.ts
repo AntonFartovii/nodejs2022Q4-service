@@ -1,23 +1,21 @@
-import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { TracksService } from '../tracks/tracks.service';
 import { Favorites, FavoritesRepsonse } from '../interfaces/favorites.interface';
-import { FavoritesEntityRes } from './entity/favorites.entity';
+import { FavoritesEntity, FavoritesEntityRes } from './entity/favorites.entity';
 import { AlbumsService } from '../albums/albums.service';
 import { ArtistsService } from '../artists/artists.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 
 @Injectable()
-export class FavsService {
-
-  private db: Favorites = {
-    artists: [],
-    albums: [],
-    tracks: []
-  }
+export class FavsService implements OnModuleInit {
 
   private entities: FavoritesRepsonse = new FavoritesEntityRes()
 
   constructor(
+    @InjectRepository(FavoritesEntity)
+    private db: Repository<FavoritesEntity>,
     @Inject(forwardRef( () => TracksService))
     private tracksService: TracksService,
     @Inject(forwardRef( () => AlbumsService))
@@ -26,47 +24,71 @@ export class FavsService {
     private artistsService: ArtistsService) {
   }
 
-  async getAll(): Promise<FavoritesRepsonse> {
+  id = 'myid'
 
-    this.entities = {
-      tracks: await this.tracksService.getAllByFilter( this.db.tracks ),
-      albums: await this.albumsService.getAllByFilter( this.db.albums ),
-      artists: await this.artistsService.getAllByFilter( this.db.artists )
+  async getAll(): Promise<FavoritesEntityRes> {
+    const res = await this.findOneFav()
+
+    return {
+      tracks: res.tracks || [],
+      albums: res.albums|| [],
+      artists: res.artists || []
     } as FavoritesRepsonse
-
-    return this.entities
   }
 
   async addEntity( id: string, name: string, service: string ) {
       await this.isExist( id, name, service )
-      await this.isAdded( id, name )
-      this.db[name].push( id )
-      return this.db
+      const fav = await this.findOneFav()
+
+      const entity = await this[service].findOne( id )
+
+      fav[name] = [...fav[name], entity];
+      return await this.db.save( fav )
   }
 
-  async deleteEntity( id: string, name: string, service: string ): Promise<void> {
-    await this[service].getOne( id )
-    await this.deleteId( id, name )
-  }
+  async deleteEntity( id: string, name: string, service?: string ): Promise<void> {
+    const favorite = await this.findOneFav();
 
-  async deleteId( id: string,  name: string ): Promise<void> {
-    this.db[name] = this.db[name].filter( entityId => entityId !== id )
-  }
+    const entity = favorite[name].find( (entity) => entity.id === id);
+    if (!entity) {
+      throw new NotFoundException(`There is no track with id: ${id}`);
+    }
 
-  async isAdded( id: string, name: string ): Promise<void> {
-      const res = this.db[name].find( entityId => entityId === id )
-      if ( res ) {
-        throw new HttpException(
-          `Entity ID = ${id} id added to favorites yet`, 400)
-      }
+    favorite[name] = favorite[name].filter((entity) => entity.id !== id);
+    await this.db.save(favorite);
   }
 
   async isExist( id: string, name: string, service: string ): Promise<void> {
     try {
-      await this[service].getOne( id )
+      await this[service].findOne( id )
     } catch (e) {
       throw new HttpException(
         `Entity ID = ${id} in ${name} does not exist`, 422)
     }
+  }
+
+  async onModuleInit(): Promise<any> {
+    const fav = await this.findOneFav()
+    if (!fav) {
+      await this.db.save({
+        id: this.id,
+        albums: [],
+        artists: [],
+        tracks: [],
+      })
+    }
+    // console.log( fav );
+  }
+
+  async findOneFav() {
+    return await this.db.findOne(
+      {
+        where:{id: this.id},
+        relations:{
+          albums: true,
+          artists: true,
+          tracks: true
+        }
+      })
   }
 }

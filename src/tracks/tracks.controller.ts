@@ -31,13 +31,13 @@ export class TracksController {
 
   @Get()
   async getAll():Promise<Track[]> {
-    return await this.trackService.getAll()
+    return await this.trackService.findAll()
   }
 
   @Get(':id')
   async getOne(@Param('id') id: string): Promise<Track> {
     validateUUIDV4( id )
-    return await this.trackService.getOne( id )
+    return await this.trackService.findOne( id )
   }
 
   @UsePipes( new ValidationPipe())
