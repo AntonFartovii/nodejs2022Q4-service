@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 
 
 @Injectable()
-export class FavsService implements OnModuleInit {
+export class FavsService {
 
   private entities: FavoritesRepsonse = new FavoritesEntityRes()
 
@@ -27,7 +27,7 @@ export class FavsService implements OnModuleInit {
   id = 'myid'
 
   async getAll(): Promise<FavoritesEntityRes> {
-    const res = await this.findOneFav()
+    const [res] = await this.findOneFav()
 
     return {
       tracks: res.tracks || [],
@@ -67,23 +67,9 @@ export class FavsService implements OnModuleInit {
     }
   }
 
-  async onModuleInit(): Promise<any> {
-    const fav = await this.findOneFav()
-    if (!fav) {
-      await this.db.save({
-        id: this.id,
-        albums: [],
-        artists: [],
-        tracks: [],
-      })
-    }
-    // console.log( fav );
-  }
-
   async findOneFav() {
-    return await this.db.findOne(
+    return await this.db.find(
       {
-        where:{id: this.id},
         relations:{
           albums: true,
           artists: true,
