@@ -21,7 +21,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "migration:create": "typeorm-ts-node-commonjs migration:create ./src/migrations/tables",
-    "migration:generate": "typeorm-ts-node-commonjs -d dataSource.ts migration:generate ./src/migrations/tables"
+    "migration:generate": "npm run build && typeorm-ts-node-commonjs -d ./dist/ormconfig.js migration:generate ./src/migrations/tables"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
@@ -42,7 +42,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "typeorm": "^0.3.6",
+    "typeorm": "0.3.11",
     "yaml": "^2.2.1",
     "uuid": "^9.0.0"
   },

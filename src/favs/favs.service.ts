@@ -1,6 +1,6 @@
 import { forwardRef, HttpException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { TracksService } from '../tracks/tracks.service';
-import { Favorites, FavoritesRepsonse } from '../interfaces/favorites.interface';
+import { FavoritesRepsonse } from '../interfaces/favorites.interface';
 import { FavoritesEntity, FavoritesEntityRes } from './entity/favorites.entity';
 import { AlbumsService } from '../albums/albums.service';
 import { ArtistsService } from '../artists/artists.service';
@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 
 
 @Injectable()
-export class FavsService {
+export class FavsService implements OnModuleInit {
 
   private entities: FavoritesRepsonse = new FavoritesEntityRes()
 
@@ -27,7 +27,7 @@ export class FavsService {
   id = 'myid'
 
   async getAll(): Promise<FavoritesEntityRes> {
-    const [res] = await this.findOneFav()
+    const res = await this.findOneFav()
 
     return {
       tracks: res.tracks || [],
@@ -37,13 +37,13 @@ export class FavsService {
   }
 
   async addEntity( id: string, name: string, service: string ) {
-      await this.isExist( id, name, service )
-      const fav = await this.findOneFav()
+    await this.isExist( id, name, service )
+    const fav = await this.findOneFav()
 
-      const entity = await this[service].findOne( id )
+    const entity = await this[service].findOne( id )
 
-      fav[name] = [...fav[name], entity];
-      return await this.db.save( fav )
+    fav[name] = [...fav[name], entity];
+    return await this.db.save( fav )
   }
 
   async deleteEntity( id: string, name: string, service?: string ): Promise<void> {
@@ -67,9 +67,23 @@ export class FavsService {
     }
   }
 
+  async onModuleInit(): Promise<any> {
+    const fav = await this.findOneFav()
+    if (!fav) {
+      await this.db.save({
+        id: this.id,
+        albums: [],
+        artists: [],
+        tracks: [],
+      })
+    }
+    // console.log( fav );
+  }
+
   async findOneFav() {
-    return await this.db.find(
+    return await this.db.findOne(
       {
+        where:{id: this.id},
         relations:{
           albums: true,
           artists: true,
