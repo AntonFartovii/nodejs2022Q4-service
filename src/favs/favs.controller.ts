@@ -6,13 +6,14 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Post,
+  Post, UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FavsService } from './favs.service';
 import { FavoritesRepsonse } from '../interfaces/favorites.interface';
 import { validateUUIDV4 } from '../utils';
 import { FavoritesEntityRes } from './entity/favorites.entity';
+import { AccessTokenGuard } from '../guards/accessToken.guard';
 
 @Controller('favs')
 export class FavsController {

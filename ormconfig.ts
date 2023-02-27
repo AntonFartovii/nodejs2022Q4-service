@@ -19,6 +19,7 @@ export const dataSourceOptions: DataSourceOptions  = {
   migrationsTableName: 'migrations',
   synchronize: false,
   migrationsRun: true,
+  logging: false
 }
 
 const dataSource = new DataSource(dataSourceOptions);

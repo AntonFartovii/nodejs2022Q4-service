@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
+  Put, UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -16,6 +16,7 @@ import { validateUUIDV4 } from '../utils';
 import { Track } from '../interfaces/track.interface';
 import { CreateTrackDto } from './dto/createTrack.dto';
 import { UpdateTrackDto } from './dto/updateTrack.dto';
+import { AccessTokenGuard } from '../guards/accessToken.guard';
 
 @Controller('track')
 export class TracksController {

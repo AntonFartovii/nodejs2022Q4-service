@@ -81,16 +81,13 @@ export class UsersService  {
   }
 
   async updateRefreshToken( id: string, newRefreshToken: string ) {
-    const user = await this.findOne( id )
+    const entity: UserEntity = await this.findOne( id ) as UserEntity
 
-    const updatedUser = {
-      ...user,
+
+    const updatedEntity = new UserEntity({
+      ...entity,
       refreshToken: newRefreshToken,
-    };
-
-    const updated = await this.dbService.save(updatedUser);
-    console.log('updated: ', updated);
-    return updated;
-
+    })
+    return (await this.dbService.save( updatedEntity )).toResponse()
   }
 }

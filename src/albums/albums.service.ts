@@ -1,4 +1,12 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Album } from '../interfaces/album.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
@@ -23,7 +31,7 @@ export class AlbumsService {
     ) {
   }
 
-  async create( dto: CreateAlbumDto ){
+  async create( dto: CreateAlbumDto ): Promise<AlbumEntity> {
     if ( dto.artistId ) {
       const artist: ArtistEntity = await this.artistService.findOne( dto.artistId );
 
@@ -31,13 +39,14 @@ export class AlbumsService {
         throw new NotFoundException(`There is no artist with id: ${dto.artistId}`);
       }
     }
+    // if ( dto.name === null ) throw new BadRequestException('name is empty')
     const entity: Album = {
       id: uuidv4(),
       name: dto.name,
       year: dto.year,
       artistId: dto.artistId ?? null
     }
-    const res = await this.dbService.create( entity )
+    const res = await this.dbService.create( dto )
     return await this.dbService.save( res )
   }
 

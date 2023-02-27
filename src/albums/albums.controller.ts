@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
+  Put, UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -17,6 +17,7 @@ import { Album } from '../interfaces/album.interface';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { AlbumEntity } from './entities/album.entity';
+import { AccessTokenGuard } from '../guards/accessToken.guard';
 
 @Controller('album')
 export class AlbumsController {

@@ -9,6 +9,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuard } from './guards/accessToken.guard';
+import { ConfigModule } from '@nestjs/config';
 
 
 @Module({
@@ -23,10 +26,20 @@ import { AuthModule } from './auth/auth.module';
       {
         ...dataSourceOptions,
         autoLoadEntities: true,
-      },
-    )
+      }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '../.env',
+    }),
+
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}

@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put, UseInterceptors,
+  Put, UseGuards, UseInterceptors,
   UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -16,7 +16,9 @@ import { validateUUIDV4 } from '../utils';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 import { UserEntity } from './entities/user.entity';
 import { ResponseUserDto } from './dto/responseUser.dto';
+import { AccessTokenGuard } from '../guards/accessToken.guard';
 
+// @UseGuards(AccessTokenGuard)
 @Controller('user')
 export class UsersController {
   constructor(private userService: UsersService) {

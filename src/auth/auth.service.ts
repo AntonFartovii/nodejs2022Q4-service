@@ -8,6 +8,7 @@ import { forwardRef } from '@nestjs/common';
 import { AuthDto } from './dto/Auth.dto';
 import { ResponseUserDto } from '../users/dto/responseUser.dto';
 import { Tokens } from '../interfaces/tokens.interfaces';
+import { AuthPlayload } from './dto/AuthPlayload';
 
 @Injectable()
 export class AuthService {
@@ -20,17 +21,17 @@ export class AuthService {
 
   async signup( dto: CreateUserDto ) {
     const hashPassport = await this.getHashData( dto.password );
-    const user = await this.userService.create({
+    return await this.userService.create({
       ...dto, password: hashPassport
     })
-
-    const tokens = await this.getTokens( user.id, user.login );
+    // return 'User created'
   }
 
-  async login( dto: AuthDto ): Promise<ResponseUserDto & Tokens> {
+  async login( dto: AuthDto ): Promise<Tokens> {
     const user = await this.userService.findOneWhere(
       dto.login
   )
+
     const passwordMatches = await bcrypt.compare(
       dto.password,
       user.password,
@@ -39,10 +40,32 @@ export class AuthService {
     if ( !passwordMatches ) throw new ForbiddenException('wrong pass')
 
     const tokens = await this.getTokens( user.id, user.login )
-    const userRes = await user.toResponse()
+    await this.userService.updateRefreshToken( user.id, tokens.refreshToken )
     return {
-      ...userRes,
       ...tokens
+    }
+  }
+
+  async refreshToken( refreshToken: string ) {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        refreshToken,
+        {
+          secret: process.env.JWT_SECRET_REFRESH_KEY,
+        })
+
+      const user = await this.userService.findOne( payload.userId )
+
+      if ( !user ) throw new ForbiddenException();
+
+      if ( user.refreshToken !== refreshToken ) throw new ForbiddenException();
+
+      const tokens = await this.getTokens( user.id, user.login )
+      await this.userService.updateRefreshToken( user.id, tokens.refreshToken )
+
+      return tokens
+    } catch {
+      throw new ForbiddenException()
     }
   }
 
@@ -50,8 +73,8 @@ export class AuthService {
     return await bcrypt.hash(data, 10);
   }
 
-  async getTokens( userId, userLogin ) {
-    const jwtPayload: JwtPayload = {
+  async getTokens( userId: string, userLogin: string ) {
+    const jwtPayload = {
       userId,
       userLogin
     };
@@ -76,11 +99,5 @@ export class AuthService {
       accessToken,
       refreshToken
     }
-  }
-
-  async updateRefreshToken( userId: string, refreshToken: string ) {
-
-    const newRefreshToken = await this.getHashData( refreshToken )
-    return await this.userService.updateRefreshToken( userId, newRefreshToken )
   }
 }
