@@ -1,10 +1,13 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/createUser.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtPayload } from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
 import { forwardRef } from '@nestjs/common';
+import { AuthDto } from './dto/Auth.dto';
+import { ResponseUserDto } from '../users/dto/responseUser.dto';
+import { Tokens } from '../interfaces/tokens.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +27,26 @@ export class AuthService {
     const tokens = await this.getTokens( user.id, user.login );
   }
 
-  async getHashData(data: string ): Promise<string> {
+  async login( dto: AuthDto ): Promise<ResponseUserDto & Tokens> {
+    const user = await this.userService.findOneWhere(
+      dto.login
+  )
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      user.password,
+    );
+
+    if ( !passwordMatches ) throw new ForbiddenException('wrong pass')
+
+    const tokens = await this.getTokens( user.id, user.login )
+    const userRes = await user.toResponse()
+    return {
+      ...userRes,
+      ...tokens
+    }
+  }
+
+  async getHashData( data: string ): Promise<string> {
     return await bcrypt.hash(data, 10);
   }
 

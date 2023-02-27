@@ -23,8 +23,23 @@ export class UsersService  {
 
   }
 
-  async findOne( id: string ): Promise<UserEntity> {
+  async findOne(id: string ): Promise<UserEntity> {
     const entity = await this.dbService.findOne({where:{id}})
+
+    if (!entity) {
+      throw new HttpException(
+        'Entity does not exist',
+        HttpStatus.NOT_FOUND)
+    }
+    return entity
+  }
+
+  async findOneWhere( login ): Promise<UserEntity> {
+    const entity = await this.dbService.findOne({
+      where: {
+        login
+      }
+    } )
 
     if (!entity) {
       throw new HttpException(
