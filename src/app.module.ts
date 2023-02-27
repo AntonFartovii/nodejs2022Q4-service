@@ -8,11 +8,17 @@ import { TracksModule } from './tracks/tracks.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
   imports: [
-    UsersModule, ArtistsModule, TracksModule, AlbumsModule, FavsModule,
+    UsersModule,
+    ArtistsModule,
+    TracksModule,
+    AlbumsModule,
+    FavsModule,
+    AuthModule,
     TypeOrmModule.forRoot(
       {
         ...dataSourceOptions,

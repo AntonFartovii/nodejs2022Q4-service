@@ -22,6 +22,9 @@ export class UserEntity {
   @VersionColumn()
   version: number
 
+  @Column({ nullable: true })
+  refreshToken: string;
+
   @CreateDateColumn({
     transformer: {
       to: (data: Date) => data,

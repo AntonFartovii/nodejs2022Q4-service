@@ -38,7 +38,7 @@ export class UsersService  {
     return await this.dbService.find()
   }
 
-  async update(id: string, updatePasswordDto: UpdatePasswordDto ): Promise<ResponseUserDto> {
+  async update( id: string, updatePasswordDto: UpdatePasswordDto ): Promise<ResponseUserDto> {
     const {oldPassword, newPassword} = updatePasswordDto
     const entity: UserEntity = await this.findOne( id ) as UserEntity
 
@@ -58,10 +58,24 @@ export class UsersService  {
     return (await this.dbService.save( updatedEntity )).toResponse()
   }
 
-  async delete(id: string): Promise<void> {
+  async delete( id: string ): Promise<void> {
     const res = await this.dbService.delete( id )
     if ( res.affected === 0) {
       throw new NotFoundException(`User id = ${id} not found`)
     }
+  }
+
+  async updateRefreshToken( id: string, newRefreshToken: string ) {
+    const user = await this.findOne( id )
+
+    const updatedUser = {
+      ...user,
+      refreshToken: newRefreshToken,
+    };
+
+    const updated = await this.dbService.save(updatedUser);
+    console.log('updated: ', updated);
+    return updated;
+
   }
 }

@@ -8,6 +8,7 @@ import { TracksService } from '../tracks/tracks.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArtistEntity } from './entities/artist.entity';
 import { In, Repository } from 'typeorm';
+
 @Injectable()
 export class ArtistsService {
   constructor(
