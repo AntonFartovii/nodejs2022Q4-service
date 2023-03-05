@@ -2,13 +2,10 @@ import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/createUser.dto';
 import * as bcrypt from 'bcrypt';
-import { JwtPayload } from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
 import { forwardRef } from '@nestjs/common';
 import { AuthDto } from './dto/Auth.dto';
-import { ResponseUserDto } from '../users/dto/responseUser.dto';
 import { Tokens } from '../interfaces/tokens.interfaces';
-import { AuthPlayload } from './dto/AuthPlayload';
 
 @Injectable()
 export class AuthService {
@@ -21,29 +18,36 @@ export class AuthService {
 
   async signup( dto: CreateUserDto ) {
     const hashPassport = await this.getHashData( dto.password );
-    return await this.userService.create({
+    const newUser = await this.userService.create({
       ...dto, password: hashPassport
     })
-    // return 'User created'
+    const tokens = await this.getTokens(newUser.id, newUser.login);
+    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+    return { ...tokens, id: newUser.id };
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashedRefreshToken = await this.getHashData(refreshToken);
+    await this.userService.updateRefreshToken( userId, hashedRefreshToken );
   }
 
   async login( dto: AuthDto ): Promise<Tokens> {
     const user = await this.userService.findOneWhere(
       dto.login
   )
+    if (!user) throw new ForbiddenException(`Invalid login or password`)
 
     const passwordMatches = await bcrypt.compare(
       dto.password,
       user.password,
     );
 
-    if ( !passwordMatches ) throw new ForbiddenException('wrong pass')
+    if ( !passwordMatches ) throw new ForbiddenException('incorrect login or password')
 
     const tokens = await this.getTokens( user.id, user.login )
     await this.userService.updateRefreshToken( user.id, tokens.refreshToken )
-    return {
-      ...tokens
-    }
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens
   }
 
   async refreshToken( refreshToken: string ) {
@@ -73,10 +77,10 @@ export class AuthService {
     return await bcrypt.hash(data, 10);
   }
 
-  async getTokens( userId: string, userLogin: string ) {
+  async getTokens( userId: string, login: string ) {
     const jwtPayload = {
       userId,
-      userLogin
+      login
     };
 
     const accessToken = await this.jwtService.sign(

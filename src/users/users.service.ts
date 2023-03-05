@@ -20,7 +20,6 @@ export class UsersService  {
 
     const res = await this.dbService.create( entity )
     return (await this.dbService.save( res )).toResponse()
-
   }
 
   async findOne(id: string ): Promise<UserEntity> {

@@ -12,10 +12,12 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 import { ConfigModule } from '@nestjs/config';
+import { LoggerModule } from './logger/logger.module';
 
 
 @Module({
   imports: [
+    LoggerModule,
     UsersModule,
     ArtistsModule,
     TracksModule,
@@ -29,7 +31,7 @@ import { ConfigModule } from '@nestjs/config';
       }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../.env',
+      envFilePath: '../.env.example',
     }),
 
   ],

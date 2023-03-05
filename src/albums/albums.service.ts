@@ -39,13 +39,8 @@ export class AlbumsService {
         throw new NotFoundException(`There is no artist with id: ${dto.artistId}`);
       }
     }
-    // if ( dto.name === null ) throw new BadRequestException('name is empty')
-    const entity: Album = {
-      id: uuidv4(),
-      name: dto.name,
-      year: dto.year,
-      artistId: dto.artistId ?? null
-    }
+    if ( dto.name === null ) throw new BadRequestException('name is empty')
+
     const res = await this.dbService.create( dto )
     return await this.dbService.save( res )
   }
@@ -67,12 +62,7 @@ export class AlbumsService {
 
   async update( id: string, dto: UpdateAlbumDto ) {
     const entity = await this.findOne( id )
-
-    entity.name = dto.name ?? entity.name
-    entity.year = dto.year ?? entity.year
-    entity.artistId = dto.artistId ?? entity.artistId
-
-    return await this.dbService.save( entity )
+    return await this.dbService.save({ ...entity, ...dto } )
   }
 
   async delete( id: string ): Promise<void> {

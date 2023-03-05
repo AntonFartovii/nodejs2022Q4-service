@@ -17,14 +17,14 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  @HttpCode(200)
+  @HttpCode(201)
   async signup(@Body() dto: CreateUserDto) {
     return await this.authService.signup( dto )
   }
 
   @Public()
   @Post('login')
-  @HttpCode(201)
+  @HttpCode(200)
   async login(@Body() dto: AuthDto): Promise<Tokens> {
     return await this.authService.login( dto )
   }
